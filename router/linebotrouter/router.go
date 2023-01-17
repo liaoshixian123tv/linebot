@@ -13,8 +13,21 @@ import (
 func AddLineBotRouter(router *gin.Engine) {
 	api := router.Group("")
 	{
+		api.GET("getAll", getAllMessage)
 		api.POST("callback", receiveMessage)
 	}
+}
+
+func getAllMessage(c *gin.Context) {
+	var res Message
+	var statusCode int
+	arr, err := linebotservice.GetAllChat()
+	statusCode, res.Message = errorHandle(err)
+	if err != nil {
+		c.JSON(statusCode, res)
+		return
+	}
+	c.JSON(statusCode, arr)
 }
 
 // receiveMessage 接收聊天資訊

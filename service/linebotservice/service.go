@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"io/ioutil"
+	"linebot/dao/chatdao"
 	"linebot/global"
 	"linebot/model"
 	"time"
@@ -12,9 +13,27 @@ import (
 	"github.com/line/line-bot-sdk-go/v7/linebot"
 )
 
+// GetAllChat 取得所有聊天記錄
+func GetAllChat() (arr []model.History, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			switch x := r.(type) {
+			case string:
+				err = errors.New(x)
+			case error:
+				err = x
+			default:
+				err = errors.New("unknown panic")
+			}
+		}
+	}()
+	arr, err = chatdao.GetAll()
+	return
+}
+
 // ReceiveMessage 接收訊息
 func ReceiveMessage(events []*linebot.Event) (err error) {
-	var details []model.History
+	var details []interface{}
 	for _, event := range events {
 		userID := event.Source.UserID
 		timestamp := event.Timestamp.UnixNano() / int64(time.Millisecond)
@@ -49,7 +68,8 @@ func ReceiveMessage(events []*linebot.Event) (err error) {
 			details = append(details, detail)
 		}
 	}
-	fmt.Printf("Detail %+v \n", details)
+	err = chatdao.InsertMany(details)
+	// fmt.Printf("Detail %+v \n", details)
 	return
 }
 
