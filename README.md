@@ -6,6 +6,7 @@ linebot exercise will receive the message from the webhook and save the message 
 ## Preparation
 * MongoDB need to executed
 * config need to complete
+* ngork 
 
 ## Run the code
 1. clone the code
@@ -75,3 +76,7 @@ if startTime and endTime both are empty, it will return all message.
 ]
 ```
 
+## Future function
+1. Add database transcation function
+2. Available for more types of message
+ * Now available __text__, __image__,__audio__,__video__,__sticker__,__location__ 
