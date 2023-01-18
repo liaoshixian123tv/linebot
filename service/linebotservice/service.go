@@ -3,11 +3,11 @@ package linebotservice
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"io/ioutil"
 	"linebot/dao/chatdao"
 	"linebot/global"
 	"linebot/model"
+	"strconv"
 	"time"
 
 	"github.com/line/line-bot-sdk-go/v7/linebot"
@@ -27,12 +27,55 @@ func GetAllChat() (arr []model.History, err error) {
 			}
 		}
 	}()
-	arr, err = chatdao.GetAll()
+	if arr, err = chatdao.GetAll(); err != nil {
+		panic(err)
+	}
+	return
+}
+
+// GetByTimeRange 取得時間範圍內的聊天紀錄
+func GetByTimeRange(startTimeStr, endTimeStr string) (arr []model.History, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			switch x := r.(type) {
+			case string:
+				err = errors.New(x)
+			case error:
+				err = x
+			default:
+				err = errors.New("unknown panic")
+			}
+		}
+	}()
+
+	var st, et int64
+	if st, err = strconv.ParseInt(startTimeStr, 10, 64); err != nil {
+		panic(err)
+	}
+	if et, err = strconv.ParseInt(startTimeStr, 10, 64); err != nil {
+		panic(err)
+	}
+	if arr, err = chatdao.GetByTimeRange(st, et); err != nil {
+		panic(err)
+	}
+
 	return
 }
 
 // ReceiveMessage 接收訊息
 func ReceiveMessage(events []*linebot.Event) (err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			switch x := r.(type) {
+			case string:
+				err = errors.New(x)
+			case error:
+				err = x
+			default:
+				err = errors.New("unknown panic")
+			}
+		}
+	}()
 	var details []interface{}
 	for _, event := range events {
 		userID := event.Source.UserID
@@ -42,34 +85,35 @@ func ReceiveMessage(events []*linebot.Event) (err error) {
 			switch message := event.Message.(type) {
 			case *linebot.TextMessage: // 一般文字
 				if detail, err = textHandle(message, timestamp, userID); err != nil {
-					return err
+					panic(err)
 				}
 			case *linebot.ImageMessage: // 圖片檔案
 				if detail, err = imageHandle(message, timestamp, userID); err != nil {
-					return err
+					panic(err)
 				}
 			case *linebot.VideoMessage: // 影片檔案
 				if detail, err = videoHandle(message, timestamp, userID); err != nil {
-					return err
+					panic(err)
 				}
 			case *linebot.AudioMessage: // 音頻檔案
 				if detail, err = aduioHandle(message, timestamp, userID); err != nil {
-					return err
+					panic(err)
 				}
 			case *linebot.LocationMessage: // 位置檔案
 				if detail, err = locationHandle(message, timestamp, userID); err != nil {
-					return err
+					panic(err)
 				}
 			case *linebot.StickerMessage: // 貼圖檔案
 				if detail, err = stickerHandle(message, timestamp, userID); err != nil {
-					return err
+					panic(err)
 				}
 			}
 			details = append(details, detail)
 		}
 	}
-	err = chatdao.InsertMany(details)
-	// fmt.Printf("Detail %+v \n", details)
+	if err = chatdao.InsertMany(details); err != nil {
+		panic(err)
+	}
 	return
 }
 
@@ -98,12 +142,12 @@ func textHandle(message *linebot.TextMessage, timestamp int64, userID string) (d
 	}
 	detail = model.History{
 		Content:     byteArr,
+		ContentStr:  message.Text,
 		MessageID:   message.ID,
 		Timestamp:   timestamp,
 		UserID:      userID,
 		MessageType: model.TextType,
 	}
-	fmt.Println(string(byteArr))
 	return
 }
 

@@ -6,6 +6,7 @@ import (
 	"linebot/global"
 	"linebot/init/linebotinit"
 	"linebot/init/mongodbinit"
+	"linebot/init/sysparaminit"
 	"linebot/router/linebotrouter"
 	"net/http"
 
@@ -13,12 +14,13 @@ import (
 )
 
 func init() {
+	sysparaminit.NewSetting()
 	linebotinit.LineBotInit()
 	mongodbinit.MongoDBInit()
 }
 
 func main() {
-	gin.SetMode(gin.ReleaseMode)
+	gin.SetMode(global.ServerSetting.RunMode)
 	router := gin.New()
 	router.Use(corsMiddleware())
 	linebotrouter.AddLineBotRouter(router)
@@ -35,8 +37,8 @@ func main() {
 		}
 	}()
 
-	fmt.Println("running on: 9090")
-	router.Run(":9090")
+	fmt.Println("running on: " + global.ServerSetting.HttpPort)
+	router.Run(":" + global.ServerSetting.HttpPort)
 }
 
 // corsMiddleware 允許cors請求

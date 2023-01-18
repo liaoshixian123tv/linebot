@@ -2,6 +2,7 @@ package linebotrouter
 
 import (
 	"linebot/global"
+	"linebot/model"
 	"linebot/service/linebotservice"
 	"net/http"
 
@@ -13,19 +14,36 @@ import (
 func AddLineBotRouter(router *gin.Engine) {
 	api := router.Group("")
 	{
-		api.GET("getAll", getAllMessage)
-		api.POST("callback", receiveMessage)
+		api.GET("getmessage", getMessage)
+		api.POST("receivemessage", receiveMessage)
 	}
 }
 
-func getAllMessage(c *gin.Context) {
+/*
+Header: startTime 、 endTime ， 倘若startTime 、 endTime 都為空則取全部 否則取時間費圍內的聊天紀錄含頭尾
+*/
+// getMessage 取得聊天紀錄
+func getMessage(c *gin.Context) {
 	var res Message
 	var statusCode int
-	arr, err := linebotservice.GetAllChat()
-	statusCode, res.Message = errorHandle(err)
-	if err != nil {
-		c.JSON(statusCode, res)
-		return
+	var arr []model.History
+	startTime, endTime := c.GetHeader("startTime"), c.GetHeader("endTime")
+	if startTime == "" && endTime == "" {
+		tmpArr, err := linebotservice.GetAllChat()
+		statusCode, res.Message = errorHandle(err)
+		if err != nil {
+			c.JSON(statusCode, res)
+			return
+		}
+		arr = tmpArr
+	} else {
+		tmpArr, err := linebotservice.GetByTimeRange(startTime, endTime)
+		statusCode, res.Message = errorHandle(err)
+		if err != nil {
+			c.JSON(statusCode, res)
+			return
+		}
+		arr = tmpArr
 	}
 	c.JSON(statusCode, arr)
 }

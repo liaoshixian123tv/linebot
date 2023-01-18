@@ -8,7 +8,7 @@ import (
 
 // LineBotInit 初始化line bot 機器人
 func LineBotInit() (err error) {
-	global.LineBotClient, err = linebot.New(global.ChannelScrect, global.ChannelAccessToken)
+	global.LineBotClient, err = linebot.New(global.LinebotSettings.ChannelScrect, global.LinebotSettings.ChannelAccessToken)
 	if err != nil {
 		panic(err)
 	}

@@ -12,7 +12,19 @@ import (
 
 // MongoDBInit MongoDB初始化
 func MongoDBInit() (err error) {
-	url := "mongodb://localhost:27017"
+	url := ""
+
+	usr := global.DatabaseSettings.Username
+	pwd := global.DatabaseSettings.Password
+	host := global.DatabaseSettings.Host
+	port := global.DatabaseSettings.Port
+
+	if global.DatabaseSettings.Username == "" && global.DatabaseSettings.Password == "" {
+		url = fmt.Sprintf("mongodb://%s:%s/admin", host, port)
+	} else {
+		url = fmt.Sprintf("mongodb://%s:%s@%s:%s/admin", usr, pwd, host, port)
+	}
+
 	global.MongoDBClient, err = mongo.Connect(context.TODO(), options.Client().ApplyURI(url))
 	if err != nil {
 		panic(err)

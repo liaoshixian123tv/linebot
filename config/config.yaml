@@ -1,0 +1,12 @@
+Server: #服務設定
+  RunMode: release  #Gin模式 debug/release
+  HttpPort: 9090  #Http server port
+Database: #資料庫設定
+  Username: leo           #使用者名稱
+  Password: 123           #使用者密碼
+  Host: "127.0.0.1" #資料庫地址
+  Port: "27017"
+  DBName: linebot       #使用的資料庫名稱
+Linebot:
+  ChannelScrect: your ChannelScrect
+  ChannelAccessToken: your ChannelAccessToken
