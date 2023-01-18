@@ -52,7 +52,7 @@ func GetByTimeRange(startTimeStr, endTimeStr string) (arr []model.History, err e
 	if st, err = strconv.ParseInt(startTimeStr, 10, 64); err != nil {
 		panic(err)
 	}
-	if et, err = strconv.ParseInt(startTimeStr, 10, 64); err != nil {
+	if et, err = strconv.ParseInt(endTimeStr, 10, 64); err != nil {
 		panic(err)
 	}
 	if arr, err = chatdao.GetByTimeRange(st, et); err != nil {

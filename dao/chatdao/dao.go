@@ -45,7 +45,7 @@ func GetAll() (docs []model.History, err error) {
 // GetAll 取得全部
 func GetByTimeRange(st, et int64) (docs []model.History, err error) {
 	collection := global.MongoDBClient.Database("linebot").Collection(tbname.ChatHistoryCollection())
-	filter := bson.M{"timestamp": bson.M{"$gte": st, "$lte": st}}
+	filter := bson.M{"timestamp": bson.M{"$gte": st, "$lte": et}}
 	cur, err := collection.Find(context.TODO(), filter)
 	if err != nil {
 		return
