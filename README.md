@@ -4,8 +4,8 @@
 linebot exercise will receive the message from the webhook and save the message to database. It also offer a restful api which can get message from database.
 
 ## Preparation
-* MongoDB need to executed
-* config need to complete
+* MongoDB need to be executed
+* config need to be completed
 * ngork 
 
 ## Run the code
